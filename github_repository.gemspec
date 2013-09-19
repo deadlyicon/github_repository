@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = GithubRepository::VERSION
   spec.authors       = ["Jared Grippe"]
   spec.email         = ["jared@deadlyicon.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{A simple API for interacting with a github repo via the v3 API}
+  spec.summary       = %q{A simple API for interacting with a github repo via the v3 API}
   spec.homepage      = ""
   spec.license       = "MIT"
 

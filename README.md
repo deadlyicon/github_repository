@@ -1,6 +1,6 @@
 # GithubRepository
 
-TODO: Write a gem description
+A simple API for interacting with a github repo via the v3 API
 
 ## Installation
 
@@ -18,7 +18,33 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```Ruby
+
+repo = GithubRepository.get('username/repository_name',
+  login:    'your@emailaddress.com',
+  password: 'y0uRP@55w0rD',
+)
+
+repo['Gemfile'].exist?
+repo['Gemfile'].update('some content', :author_email => "foo@bar.com", :message => "fixed a bug")
+repo['Gemfile'].delete
+repo['Gemfile'].read
+repo['Gemfile'].to_s
+repo['config/database.yml']
+
+
+repo.head # => Github::Repo::Sha
+
+master = repo.branch('master') # => Github::Repo::Sha
+
+master['Gemfile'].to_s
+
+master.tree # => Github::Repo::Tree
+
+master.blobs
+
+
+```
 
 ## Contributing
 
