@@ -23,6 +23,10 @@ class GithubRepository::Tree::Tree < GithubRepository::Tree::Child
     tree.children
   end
 
+  def ls
+    tree.ls
+  end
+
   def subdirectory?
     mode == "040000"
   end

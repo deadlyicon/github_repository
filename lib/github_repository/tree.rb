@@ -29,8 +29,7 @@ class GithubRepository::Tree
 
   def reload!
     @children = nil
-    # @data = client.get("/repos/#{owner}/#{repo}/git/trees/#{sha}", query:{recursive: 1})
-    @data = client.get("/repos/#{owner}/#{repo}/git/trees/#{sha}")
+    @data = client.get("/repos/#{owner}/#{repo}/git/trees/#{sha}", query:{recursive: 1})
   end
 
   def url
@@ -39,18 +38,17 @@ class GithubRepository::Tree
 
   def children
     @children ||= data["tree"].map do |member_data|
-      _class =
       case member_data["type"]
-      when "blob"; GithubRepository::Tree::blob
+      when "blob"; GithubRepository::Tree::Blob
       when "tree"; GithubRepository::Tree::Tree
-          parent: self,
-          mode:   member_data["mode"],
-          type:   member_data["type"],
-          sha:    member_data["sha"],
-          path:   member_data["path"],
-          url:    member_data["url"],
-        )
-      end
+      end.new(
+        parent: self,
+        mode:   member_data["mode"],
+        type:   member_data["type"],
+        sha:    member_data["sha"],
+        path:   member_data["path"],
+        url:    member_data["url"],
+      )
     end
   end
 
@@ -62,6 +60,10 @@ class GithubRepository::Tree
     children.find do |member|
       member.path == path
     end
+  end
+
+  def ls
+    children.reject{|x| x.path.include? '/' }
   end
 
 end
