@@ -15,6 +15,7 @@ class GithubRepository::Tree::Child
     %{#<#{self.class} #{parent.owner}/#{parent.repo} #{path} #{sha}>}
   end
 
+  # http://developer.github.com/v3/git/trees/#create-a-tree
   # 100644 for file (blob),
   # 100755 for executable (blob),
   # 040000 for subdirectory (tree),

@@ -1,4 +1,4 @@
-class GithubRepository::Tree::Subtree < GithubRepository::Tree::Child
+class GithubRepository::Tree::Tree < GithubRepository::Tree::Child
 
   include Enumerable
 

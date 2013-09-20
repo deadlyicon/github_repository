@@ -1,7 +1,8 @@
 class GithubRepository::Tree
 
-  autoload :Subtree, 'github_repository/tree/subtree'
-  autoload :Blob,    'github_repository/tree/blob'
+  autoload :Child, 'github_repository/tree/child'
+  autoload :Tree,  'github_repository/tree/tree'
+  autoload :Blob,  'github_repository/tree/blob'
 
   include Enumerable
 
@@ -28,6 +29,7 @@ class GithubRepository::Tree
 
   def reload!
     @children = nil
+    # @data = client.get("/repos/#{owner}/#{repo}/git/trees/#{sha}", query:{recursive: 1})
     @data = client.get("/repos/#{owner}/#{repo}/git/trees/#{sha}")
   end
 
@@ -37,18 +39,10 @@ class GithubRepository::Tree
 
   def children
     @children ||= data["tree"].map do |member_data|
+      _class =
       case member_data["type"]
-      when "blob"
-        GithubRepository::Tree::Blob.new(
-          parent: self,
-          mode:   member_data["mode"],
-          type:   member_data["type"],
-          sha:    member_data["sha"],
-          path:   member_data["path"],
-          url:    member_data["url"],
-        )
-      when "tree"
-        GithubRepository::Tree::Subtree.new(
+      when "blob"; GithubRepository::Tree::blob
+      when "tree"; GithubRepository::Tree::Tree
           parent: self,
           mode:   member_data["mode"],
           type:   member_data["type"],
