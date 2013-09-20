@@ -13,25 +13,20 @@ class GithubRepository
   autoload :Author,    'github_repository/author'
 
   def self.[] path
-    new path: path
+    owner, repo = path.split('/')
+    new owner: owner, repo: repo
   end
 
   def initialize options
-    @path = options.fetch(:path)
+    @owner = options.fetch(:owner)
+    @repo = options.fetch(:repo)
     @client = options[:client]
   end
 
-  attr_reader :path
+  attr_reader :owner, :repo
 
   def client
     @client ||= GithubRepository::Client.new
-  end
-
-  %w{get post put patch delete}.each do |method|
-    define_method "client_#{method}" do |path, options={}|
-      path = ::File.join("/repos/#{self.path}", path)
-      client.public_send method, path, options
-    end
   end
 
   # def sha sha
@@ -39,11 +34,21 @@ class GithubRepository
   # end
 
   def commit sha
-    ::GithubRepository::Commit.new(self, sha)
+    ::GithubRepository::Commit.new(
+      owner:  owner,
+      repo:   repo,
+      client: client,
+      sha:    sha,
+    )
   end
 
   def branch branch
-    ::GithubRepository::Branch.new(self, branch)
+    ::GithubRepository::Branch.new(
+      owner:  owner,
+      repo:   repo,
+      client: client,
+      branch: branch,
+    )
   end
 
   def master

@@ -1,23 +1,34 @@
 class GithubRepository::File
 
+  def initialize options
+    @owner  = options.fetch(:owner)
+    @repo   = options.fetch(:repo)
+    @sha    = options.fetch(:sha)
+    @client = options[:client]
+
+    @path     = options[:path]
+    @mode     = options[:mode]
+    @size     = options[:size]
+    @url      = options[:url]
+    @content  = options[:content]
+    @encoding = options[:encoding]
+  end
+
   def initialize repo, data
     @repo = repo
     @sha  = data.fetch("sha")
     @data = data
   end
 
-  attr_reader :repo, :sha, :data
+  attr_reader :repo, :sha, :path, :mode
 
   def blob
-    @blob ||= ::GithubRepository::Blob.new(repo, sha)
-  end
-
-  def path
-    data["path"]
-  end
-
-  def mode
-    data["mode"]
+    @blob ||= ::GithubRepository::Blob.new(
+      owner:  owner,
+      repo:   repo,
+      client: client,
+      sha:    sha,
+    )
   end
 
   def size
@@ -29,9 +40,7 @@ class GithubRepository::File
   end
 
   def content
-    return @content if defined? @content
-    @content = blob.content
-    if encoding == 'base64'
+    if @encoding == 'base64'
       @content = Base64.decode64(@content)
       @encoding = @content.encoding.to_s
     end

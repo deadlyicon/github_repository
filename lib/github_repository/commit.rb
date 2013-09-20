@@ -1,14 +1,21 @@
 class GithubRepository::Commit
 
-  def initialize repo, sha
-    @repo, @sha = repo, sha
+  def initialize options
+    @owner  = options.fetch(:owner)
+    @repo   = options.fetch(:repo)
+    @sha    = options.fetch(:sha)
+    @client = options[:client]
   end
 
   def inspect
-    %{#<#{self.class} #{repo.path} #{sha}>}
+    %{#<#{self.class} #{owner}/#{repo} #{sha}>}
   end
 
-  attr_reader :repo, :sha
+  attr_reader :owner, :repo, :sha
+
+  def client
+    @client ||= GithubRepository::Client.new
+  end
 
   def data
     @data || reload!
@@ -16,7 +23,7 @@ class GithubRepository::Commit
 
   def reload!
     @tree = @stats = @parents = @files = nil
-    @data = repo.client_get("/commits/#{sha}")
+    @data = client.get("/repos/#{owner}/#{repo}/commits/#{sha}")
   end
 
   def message
@@ -24,7 +31,9 @@ class GithubRepository::Commit
   end
 
   def tree
-    @tree ||= ::GithubRepository::Tree.new(repo, data["commit"]["tree"]["sha"])
+    @tree ||= ::GithubRepository::Tree.new(
+      owner: owner, repo: repo, client: client, sha: data["commit"]["tree"]["sha"]
+    )
   end
 
   def [] path
@@ -57,7 +66,12 @@ class GithubRepository::Commit
 
   def parents
     @parents ||= data["parents"].map do |parent_data|
-      ::GithubRepository::Commit.new(repo, parent_data["sha"])
+      ::GithubRepository::Commit.new(
+        owner:  owner,
+        repo:   repo,
+        client: client,
+        sha:    parent_data["sha"],
+      )
     end
   end
 
