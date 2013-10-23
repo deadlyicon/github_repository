@@ -1,22 +1,39 @@
 class GithubRepository::Branch
 
-  def initialize repo, name
-    @repo, @name = repo, name
+  def initialize options
+    @owner  = options.fetch(:owner)
+    @repo   = options.fetch(:repo)
+    @client = options[:client]
+    @branch = options.fetch(:branch)
   end
 
-  attr_reader :repo, :name
+  attr_reader :owner, :repo, :client, :branch
+
+  def client
+    @client ||= GithubRepository::Client.new
+  end
 
   def head
     @head || reload!
   end
 
   def reload!
-    sha = repo.client_get("/git/refs/heads/#{name}")["object"]["sha"]
-    @head = ::GithubRepository::Commit.new(repo, sha)
+    # sha = client.get("/git/refs/heads/#{branch}")
+    sha = client.get("/repos/#{owner}/#{repo}/git/refs/heads/#{branch}")["object"]["sha"]
+    @head = ::GithubRepository::Commit.new(
+      owner:  owner,
+      repo:   repo,
+      client: client,
+      sha:    sha,
+    )
   end
 
   def sha
     head.sha
+  end
+
+  def [] path
+    head[path]
   end
 
 

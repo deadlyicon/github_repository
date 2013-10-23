@@ -44,6 +44,11 @@ master.tree # => Github::Repo::Tree
 master.blobs
 
 
+
+rails = GithubRepository['rails/rails']
+rails['README.md'].content
+
+
 ```
 
 ## Contributing

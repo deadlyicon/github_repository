@@ -18,8 +18,8 @@ class GithubRepository
   end
 
   def initialize options
-    @owner = options.fetch(:owner)
-    @repo = options.fetch(:repo)
+    @owner  = options.fetch(:owner)
+    @repo   = options.fetch(:repo)
     @client = options[:client]
   end
 
@@ -57,7 +57,6 @@ class GithubRepository
 
   def [] path
     master[path]
-    # ::GithubRepository::File.new(self, path)
   end
 
 end
