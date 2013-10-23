@@ -12,6 +12,10 @@ class GithubRepository
   autoload :Directory, 'github_repository/directory'
   autoload :Author,    'github_repository/author'
 
+  class << self
+    attr_accessor :login, :password
+  end
+
   def self.[] path
     owner, repo = path.split('/')
     new owner: owner, repo: repo

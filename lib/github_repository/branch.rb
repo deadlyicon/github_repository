@@ -14,12 +14,15 @@ class GithubRepository::Branch
   end
 
   def head
-    @head || reload!
+    reload! unless defined?(@head)
+    @head
   end
 
   def reload!
     # sha = client.get("/git/refs/heads/#{branch}")
-    sha = client.get("/repos/#{owner}/#{repo}/git/refs/heads/#{branch}")["object"]["sha"]
+    response = client.get("/repos/#{owner}/#{repo}/git/refs/heads/#{branch}")
+    return @head = nil unless response["object"]
+    sha = response["object"]["sha"]
     @head = ::GithubRepository::Commit.new(
       owner:  owner,
       repo:   repo,

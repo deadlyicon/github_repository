@@ -5,6 +5,11 @@ class GithubRepository::Client
   SCHEME = 'https'
   HOST   = 'api.github.com'
 
+  def initialize options={}
+    @login    = options[:login]    || GithubRepository.login
+    @password = options[:password] || GithubRepository.password
+  end
+
   %w{get post put patch delete}.each do |method|
     define_method method do |path, options={}|
       request method, path, options
@@ -16,7 +21,12 @@ class GithubRepository::Client
     uri = URI("#{SCHEME}://#{HOST}")
     uri.path = path
     puts "#{method} #{uri}"
-    # options[:basic_auth] = {:username => @login, :password => @password}
+
+    options[:basic_auth] ||= {
+      :username => @login,
+      :password => @password
+    } if @login && @password
+
     HTTParty.public_send(method, uri.to_s, options)
   end
 
